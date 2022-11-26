@@ -11,17 +11,38 @@ include('./templates/header.php');
     <div class="container px-4">
         <div class="row">
             <div class="col-4 separadorDoble">
-            </div>
-            <div class="col-4 separadorDoble">
+
             <?php
-                if ($_SESSION['ID_ROL']==2){
-                    echo '                <button type="button" id="Agregar_Producto" class="btn btn-primary btn-info full_input"> Agregar Producto </button>';
-            }else if ($_SESSION['ID_ROL']== 3) {
-                echo '                <button type="button" id="Autorizar_Producto" class="btn btn-primary btn-info full_input" > Autorizar Producto </button>';
-            }
+                if ($_SESSION['ID_ROL']==2){ ?>
+            <button type="button" id="pendientesdeAutori" class="btn btn-primary btn-info full_input"> Ver productos pendientes </button>
+
+            <?php
+                }
             ?>
             </div>
             <div class="col-4 separadorDoble">
+            <?php
+                if ($_SESSION['ID_ROL']==2){ ?>
+            <button type="button" id="Agregar_Producto" class="btn btn-primary btn-info full_input"> Agregar Producto </button>
+
+            <?php
+                }else if ($_SESSION['ID_ROL']== 3) {
+            ?>
+                <button type="button" id="Autorizar_Producto" class="btn btn-primary btn-info full_input" > Autorizar Producto </button>
+            <?php 
+                }
+            ?>
+            </div>
+            <div class="col-4 separadorDoble">
+            <?php
+                if ($_SESSION['ID_ROL']==2){ ?>
+            <button type="button" id="cotizaPendiente" class="btn btn-primary btn-info full_input"> Cotizaciones </button>
+
+            <?php
+                }
+            ?>
+
+
             </div>
         </div>                    
     </div>

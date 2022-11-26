@@ -1,9 +1,7 @@
-USE TOYfeliZ;
-
 #-----------------------------PROCEDURES----------------------------------
 
 
-delimiter =)
+delimiter ))
 CREATE procedure sp_gestionUsuarios (	pAccion	tinyint,	PID_USUARIO INT,	Pnombre VARCHAR(50),	Papellido VARCHAR(50),	Pnacimiento VARCHAR(45),
 				Pusuario VARCHAR(20),	Pcorreo VARCHAR(100),	Pcontrasenia VARCHAR(40),	Psexo VARCHAR(10),	Pprivacidad VARCHAR(10),	Pfoto LONGBLOB,    pID_ROL INT )
 BEGIN
@@ -25,17 +23,19 @@ DECLARE id_user	INT; DECLARE id_rol_tem INT;
 	if pAccion = 2 then
 		SELECT contrasenia, usuario, ID_ROL, ID_USUARIO, estatus FROM usuarios WHERE correo = Pcorreo;
     end if;
-#Verificar privacidad Creo que esta podria ir a function
     if pAccion = 3 then
-		SELECT privacidad FROM usuarios WHERE correo = Pcorreo;
+		SELECT estatus FROM usuarios WHERE correo = Pcorreo;
     end if;
 #Cambios
 	if pAccion = 4 then
 		SELECT nombre, apellido, usuario, nacimiento, correo, sexo, fechaCreacion, foto, privacidad FROM usuarios WHERE usuario = Pusuario;
     end if;
 	if pAccion = 5 then
-		UPDATE usuarios set foto = Pfoto, nombre	= Pnombre, apellido = Papellido, usuario = Pusuario, correo = Pcorreo,
-        nacimiento = Pnacimiento, sexo = Psexo, privacidad = Pprivacidad where ID_USUARIO = PID_USUARIO and estatus = 1;
+		if (Pfoto = 'null') then
+			UPDATE usuarios set  correo = Pcorreo ,  usuario = Pusuario , nombre = Pnombre, apellido = Papellido,	nacimiento = Pnacimiento, sexo = Psexo, privacidad = Pprivacidad where ID_USUARIO = PID_USUARIO and estatus = 1;
+        else
+			UPDATE usuarios set  correo = Pcorreo ,  usuario = Pusuario , foto = Pfoto, nombre = Pnombre, apellido = Papellido, nacimiento = Pnacimiento, sexo = Psexo, privacidad = Pprivacidad where ID_USUARIO = PID_USUARIO and estatus = 1;
+        end if;
     end if;
 #Bajas
 	if pAccion = 6 then	#baja lógica
@@ -45,10 +45,8 @@ DECLARE id_user	INT; DECLARE id_rol_tem INT;
 		DELETE FROM usuarios WHERE ID_USUARIO = PID_USUARIO;
     end if;
 
-END =)
+END ))
 delimiter ;
-
-
 
 
 delimiter =)
@@ -70,7 +68,6 @@ BEGIN
     end if;
 END =)
 delimiter ;
-CALL sp_GetCorreoContra (3, null, 'rc', null);
 
 delimiter =)
 CREATE procedure  sp_gestionCategorias (	pAccion	tinyint,	PID_CATEGORIA INT,	Pnombre VARCHAR(50),	Pdescripcion VARCHAR(500),	pID_VENDEDOR INT)
@@ -122,17 +119,19 @@ BEGIN
 END %%
 delimiter ;
 
-
-
-
-
-
-
-
 delimiter %%
 CREATE procedure  sp_autorizar (pID_PRODUCTO INT)
 BEGIN
 	UPDATE juguetes set autorizado = 1 WHERE ID_PRODUCTO = pID_PRODUCTO;
+END %%
+delimiter ;
+
+
+delimiter %%
+CREATE procedure  sp_MISJUGUETES (pID_VENDEDOR INT)
+BEGIN
+
+SELECT ID_PRODUCTO, nombre, descripcion, tipoVenta, autorizado, valoracion, precio, cantidad, ID_VENDEDOR, icono, vendedor, categorias,  video, imagenes from viewJuguetesDelVendedorSINAUTORIZAR where ID_VENDEDOR = pID_VENDEDOR ;
 END %%
 delimiter ;
 
@@ -162,38 +161,34 @@ BEGIN
 		SELECT ID_PRODUCTO, nombre, descripcion,tipoVenta, valoracion, precio, cantidad, ID_VENDEDOR, icono, vendedor, categorias, video, imagenes FROM viewJuguetesnoAUTORIZ;
     end if;
 	if pAccion = 6 then
-		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor, ventas FROM viewJuguetesPorVenta;
+
+		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor, ventas FROM viewJuguetesPorVenta where estatus = 1 order by ventas desc ;
+
+#		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor, ventas FROM viewJuguetesPorVenta order by ventas desc;
     end if;
+    
+    
 END =)
 delimiter ;
-
-
-
-
-
-
 
 delimiter =)
 CREATE procedure sp_gestionBusqueda (pAccion	tinyint, pBusqueda varchar(50))
 BEGIN
 #Altas
 	if pAccion = 1 then
-		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor FROM viewJuguetesPorBusqueda  WHERE nombre like pBusqueda order by precio asc;
+		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor FROM viewJuguetesPorBusqueda  WHERE nombre like pBusqueda and estatus = 1 order by precio asc;
     end if;
     if pAccion = 2 then
-		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor  FROM viewJuguetesPorBusqueda WHERE nombre like pBusqueda order by precio desc;
+		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor  FROM viewJuguetesPorBusqueda WHERE nombre like pBusqueda and estatus = 1 order by precio desc;
     end if;
     if pAccion = 3 then
 		SELECT usuario FROM usuarios WHERE usuario like pBusqueda;
     end if;
+     if pAccion = 4 then
+		SELECT ID_PRODUCTO, nombre, tipoVenta, precio, ID_VENDEDOR, icono, vendedor, categorias FROM viewJuguetesPorCategoria  WHERE categorias like pBusqueda and estatus = 1 order by precio desc;
+    end if;
 END =)
 delimiter ;
-
-
-
-
-
-
 
 delimiter &&
 CREATE procedure sp_infoJUGUETE (pAccion tinyint, pID_PRODUCTO int)
@@ -211,11 +206,20 @@ BEGIN
 	if pAccion = 4 then
 		SELECT ID_PRODUCTO, imagen FROM viewJugueteImg where ID_PRODUCTO = pID_PRODUCTO;
     end if;
-    
+    #baja logica
+    if pAccion = 5 then
+		UPDATE juguetes set estatus  = 0 where ID_PRODUCTO = pID_PRODUCTO;
+    end if;
+    #modificar
+    if pAccion = 6 then
+		SELECT ID_PRODUCTO, imagen FROM viewJugueteImg where ID_PRODUCTO = pID_PRODUCTO;
+    end if;
+     #modificar 2
+    if pAccion = 7 then
+		SELECT ID_PRODUCTO, imagen FROM viewJugueteImg where ID_PRODUCTO = pID_PRODUCTO;
+    end if;
 END &&
 delimiter ;
-
-
 
 delimiter &&
 CREATE procedure sp_comentarios (pAccion tinyint, pID_PRODUCTO int, Pcomentario VARCHAR(500), Pcalificación INT, pID_USUARIO INT)
@@ -237,34 +241,80 @@ delimiter ;
 
 
 
-
-
-delimiter =)
-CREATE procedure sp_gestionCarrito (pAccion	tinyint,	pID_PRODUCTO INT, pID_CLIENTE INT, PprecioPagar FLOAT, Pestatus BIT, PcantidadCompra INT)
+delimiter &&
+CREATE procedure sp_cotizaciones (pAccion tinyint, pID_PRODUCTO int, pID_VENDEDOR INT, pID_cotizacion int)
 BEGIN
-DECLARE ID_CARRITO INT;
+
+DECLARE ID_CARRITO_tmp INT; declare pID_CLIENTE int; declare pPrecio float;
+Set pID_CLIENTE = (SELECT ID_USUARIO from cotizaciones WHERE ID_cotizacion = pID_cotizacion);
 Set ID_CARRITO_tmp = (SELECT ID_CARRITO from carrito WHERE ID_CLIENTE = pID_CLIENTE);
+Set pPrecio = (select precio from cotizaciones WHERE ID_cotizacion = pID_cotizacion);
+Set pID_PRODUCTO =(select ID_JUGUETE from cotizaciones WHERE ID_cotizacion = pID_cotizacion);
+
+	if pAccion = 1 then
+			UPDATE cotizaciones set response = 1, request = 1 where ID_cotizacion = pID_cotizacion;
+            
+			INSERT into poductoscarrito (ID_CARRITO, ID_JUGUETE, ID_CLIENTE, cantidadCompra, preciocotizado)
+            VALUES (ID_CARRITO_tmp, pID_PRODUCTO, pID_CLIENTE, 1, pPrecio);
+    end if;
+    if pAccion = 2 then
+			UPDATE cotizaciones set response = 2, request = 1  where ID_cotizacion = pID_cotizacion;
+    end if;
+    if pAccion = 3 then
+		select a.ID_cotizacion, a.ID_JUGUETE, a.ID_USUARIO, a.precio, b.usuario, c.nombre
+		from cotizaciones a inner join usuarios b on a.ID_USUARIO = b.ID_USUARIO 
+        inner join juguetes c on a.ID_JUGUETE = c.ID_PRODUCTO where a.request = 0 AND a.ID_VENDEDOR = pID_VENDEDOR ;
+    end if;
+END &&
+delimiter ;
+ 
+delimiter ==
+CREATE procedure sp_gestionCarrito (pAccion	tinyint, pID_PRODUCTO INT, pID_CLIENTE INT, PprecioPagar FLOAT, PcantidadCompra INT)
+BEGIN
+DECLARE ID_CARRITO_tmp INT; declare tipoventa_tmp VARCHAR(30); declare pID_VENDEDOR int;
+Set ID_CARRITO_tmp = (SELECT ID_CARRITO from carrito WHERE ID_CLIENTE = pID_CLIENTE);
+Set tipoventa_tmp = (SELECT tipoVenta from juguetes where ID_PRODUCTO = pID_PRODUCTO );
+set pID_VENDEDOR = (select ID_VENDEDOR from juguetes where ID_PRODUCTO = pID_PRODUCTO);
 #Altas
 	if pAccion = 1 then
-		INSERT into poductoscarrito (ID_CARRITO, ID_JUGUETE, cantidadCompra) VALUES (ID_CARRITO_tmp, pID_PRODUCTO, 1);
+		if  tipoventa_tmp = 'Cotizar' then
+			INSERT into poductoscarrito (ID_CARRITO, ID_JUGUETE, ID_CLIENTE, cantidadCompra, preciocotizado) VALUES (ID_CARRITO_tmp, pID_PRODUCTO, pID_CLIENTE, PcantidadCompra, 1);
+        end if;
+        if tipoventa_tmp = 'Vender' then
+			INSERT into poductoscarrito (ID_CARRITO, ID_JUGUETE, ID_CLIENTE, cantidadCompra, preciocotizado) VALUES (ID_CARRITO_tmp, pID_PRODUCTO, pID_CLIENTE, PcantidadCompra, 0);
+        end if;
     end if;
 #Seleccion
-    if pAccion = 1 then
-		SELECT (ID_CARRITO, ID_JUGUETE, cantidadCompra) FROM poductoscarrito  VALUES (ID_CARRITO_tmp, pID_PRODUCTO, 1);
+    if pAccion = 2 then
+		SELECT ID_CARRITO, ID_JUGUETE, preciocotizado, cantidadCompra, nombre, precio, icono, cantidad FROM viewCarrito WHERE  ID_CLIENTE = pID_CLIENTE and estatus = 0;
+        
     end if;
 #Compra
-    if pAccion = 2 then
-		INSERT into poductoscarrito (ID_CARRITO, ID_JUGUETE, cantidadCompra) VALUES (ID_CARRITO_tmp, pID_PRODUCTO, 1);
+    if pAccion = 3 then
+		UPDATE poductoscarrito set estatus = 1 where ID_CLIENTE = pID_CLIENTE;
+		DELETE FROM poductoscarrito where ID_CLIENTE = pID_CLIENTE;
     end if;
-END =)
+#Totalprecio
+	if pAccion = 4 then
+		SELECT  f_precioAPagar(pID_CLIENTE) as total;
+    end if;
+#Vaciar
+	if pAccion = 5 then
+		DELETE FROM poductoscarrito where ID_CLIENTE = pID_CLIENTE;
+    end if;
+#Eliminar producto///
+	if pAccion = 6 then
+		DELETE FROM poductoscarrito where ID_CLIENTE = pID_CLIENTE and ID_JUGUETE = pID_PRODUCTO;
+    end if;
+    #cotizar///
+	if pAccion = 7 then
+		INSERT into cotizaciones (ID_USUARIO, ID_JUGUETE, ID_VENDEDOR, precio) VALUES (pID_CLIENTE, pID_PRODUCTO, pID_VENDEDOR , PprecioPagar);
+    end if;
+    
+END ==
 delimiter ;
 
-
-CREATE VIEW viewHistorialCliente AS
-SELECT a.ID_VENTA, a.fechaCOMPRA, a.cantidadCompradaVendida, a.precioFinalProducto, a.ID_CLIENTE, b.nombre, b.ID_PRODUCTO,  group_concat(distinct e.nombre ) categoria
-		FROM pedidosyventas a INNER JOIN juguetes b ON a.ID_JUGUETE = b.ID_PRODUCTO INNER JOIN categoriajuguete c ON a.ID_JUGUETE = c.ID_JUGUETE
-		INNER JOIN  categorias e ON e.ID_CATEGORIA = c.ID_CATEGORIA group by 1;
-        
+    
 delimiter &&
 CREATE procedure sp_gestionHistorial (pAccion	tinyint, Pdesde VARCHAR(100), Phasta VARCHAR(100), pID_USUARIO int)
 BEGIN
@@ -286,7 +336,3 @@ BEGIN
     end if;
 END &&
 delimiter ;
-
-SELECT a.ID_VENTA, a.fechaCOMPRA, a.cantidadCompradaVendida, a.precioFinalProducto, a.ID_CLIENTE, b.nombre, b.cantidad, b.ID_PRODUCTO, b.valoracion, group_concat(distinct e.nombre ) categoria
-		FROM pedidosyventas a INNER JOIN juguetes b ON a.ID_JUGUETE = b.ID_PRODUCTO INNER JOIN categoriajuguete c ON a.ID_JUGUETE = c.ID_JUGUETE
-		INNER JOIN  categorias e ON e.ID_CATEGORIA = c.ID_CATEGORIA WHERE a.ID_VENDEDOR =  pID_USUARIO group by 1;

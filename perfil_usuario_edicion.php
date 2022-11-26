@@ -9,7 +9,7 @@ include('./templates/header.php');
             
             <img src="images/Logo - copia.png"  style="border-radius: 50%;"  width = 200px height =200px alt="" id = "foto_pefil">
             <br> <br>
-            <input type="file" name ="foto" id="foto" required>
+            <input type="file" name ="foto" id="foto" >
             <hr>
             <input type="text" class="full_input" style="width: 400px;" id= "ednombre" name="ednombre" placeholder ="Nombre" required>
             <input type="text" class="full_input" style="width: 400px;" id= "edapellido" name="edapellido" placeholder ="Apellido" required>

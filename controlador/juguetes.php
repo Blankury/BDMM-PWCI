@@ -13,10 +13,34 @@ if (isset($_POST['action'])){
     Autorizar();
     else if ($action == 'setComent')
     setComent();
+    else if ($action == 'eliminar')
+    eliminar();
+    else if ($action == 'getmisproductos')
+    getmisproductos();
 }
 else {
 
     $videos = $_FILES['videos']['name'];
+
+
+    $i =0;
+    foreach($videos as $selected):
+        $fileName = basename($selected);
+        $videoType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedTypes = array("mp4", "wav");
+
+        if (in_array($videoType, $allowedTypes)){
+            $videoName = $_FILES["videos"]["tmp_name"][$i]; //accede a la carpeta temporal de imgs del servidor (XAMP)
+            $video64 = base64_encode(file_get_contents($videoName)); //codifica los bits en base 64
+            $realvideo[] = 'data:image/'. $videoType. ';base64, '.$video64;
+
+        }else{
+            echo "formato no valido.";
+            exit();  
+        }
+        $i=$i+1;
+    endforeach;
+
 
     $imagenes = $_FILES['imagenes']['name'];
     $i =0;
@@ -51,7 +75,6 @@ else {
             $image64 = base64_encode(file_get_contents($imageName)); //codifica los bits en base 64
             
             $_realImage2_icon = 'data:image/'. $imageType. ';base64, '.$image64;
-            echo $_realImage2_icon; exit();
 
         }else{
             echo "formato no valido.";
@@ -72,7 +95,7 @@ else {
     $icono = $_realImage2_icon;
     $valoracion = 1;
     $registro = new JuguetesControlador($nombre, $descripcion, $tipoVenta, $valoracion , $precio, $cantidad, $ID_VENDEDOR,
-     $icono, $categorias, "", $videos, $_realImage);
+     $icono, $categorias, "", $realvideo, $_realImage);
     $registro->PublicarJuguete();
 
     //header ("location: ../index.php?error=none");
@@ -111,3 +134,21 @@ function Autorizar(){
     $juguete = new JuguetesControlador("", "", "", "", "", "", "", "", "", $ID_PRODUCTO, "", "");
     $juguete->AutorizarJuguete();    
 }
+
+
+function eliminar(){
+    $ID_PRODUCTO = $_POST['ID_PRODUCTO'];
+    $juguete = new JuguetesControlador("", "", "", "", "", "", "", "", "", $ID_PRODUCTO, "", "");
+    $juguete->eliminarjuguete();    
+}
+
+
+function getmisproductos(){
+    session_start();
+    $ID_VENDEDOR = $_SESSION['ID_USUARIO'];
+    $juguete = new JuguetesControlador("", "", "", "", "", "", $ID_VENDEDOR, "", "", "", "", "");
+    $juguete->cargarproductos();    
+}
+
+
+

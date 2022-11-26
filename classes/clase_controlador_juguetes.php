@@ -65,6 +65,13 @@ class JuguetesControlador extends Toys {
         $this->Autorizar($this->ID_PRODUCTO);
         echo "Se ha autorizado el producto.";     
     }
+    public function eliminarjuguete(){
+        $this->accioneliminarjuguete($this->ID_PRODUCTO);
+        echo "Se ha eliminado el producto.";     
+    }
+    public function cargarproductos(){
+        $this->cargarautorizado($this->ID_VENDEDOR);
+    }
 
     private function inputVacio(){
         $check;

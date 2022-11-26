@@ -14,6 +14,7 @@ function cargarinfo(){
         async: false,
         success: function(result){
             var data = JSON.parse(result);
+
             $("#valoraciones").html(data['jug'][0].valoracion);
             $("#nombre_vendedor").html(data['jug'][0].vendedor);
             $("#nombre_product_grande").html(data['jug'][0].nombre);
@@ -23,9 +24,21 @@ function cargarinfo(){
             $("#precio_product").html(data['jug'][0].precio);
             if (data['jug'][0].tipoVenta == "Cotizar"){
                 $("#Productocotizar").html(data['jug'][0].tipoVenta);
+                if (data['jug'][0].cantidad > 0){
+                    $("#botones").append('    <button type="button" id="aCarrito" class="btn btn-primary btn-info" data-bs-toggle="modal" data-bs-target="#cotModal"> Agregar al carrito </button> ' );
+                    $("#acomprar").attr("max", data['jug'][0].cantidad );
+                }
+                
+
             }
             else{
                 $("#Productocotizar").html("Venta");
+                
+                if (data['jug'][0].cantidad > 0){
+                    $("#botones").append('    <button type="button" id="aCarrito" class="btn btn-primary btn-info" data-bs-toggle="modal" data-bs-target="#añadirCarrModal"> Agregar al carrito </button> ' );
+                    $("#acomprar").attr("max", data['jug'][0].cantidad );
+                }
+
             }
             $("#icono_product").attr("src",data['jug'][0].icono);
             for (let i = 0; i < data['jug'].length;i++){
@@ -99,6 +112,7 @@ function recargarcomentarios(){
     
     
 }
+
 $(document).ready(function(){  
     $("#aLista").click(function(){
             $.ajax({
@@ -112,6 +126,68 @@ $(document).ready(function(){
                 }
             })
     });
+    $("#EliminarJuguete").click(function(){
+        $.ajax({
+            type: "POST",
+            url: './controlador/juguetes.php',
+            data: {action: 'eliminar', ID_PRODUCTO: ID_PRODUCTO}, 
+            success: function(result) {
+                alert(result);
+            }, error: function(result){
+                alert("Error en el php" + result);
+            }
+        })
+});
+
+    $("#quitarTodo").click(function(){
+        $.ajax({
+            type: "POST",
+            url: './controlador/carrito.php',
+            data: { action: 'vaciar'}, 
+            success: function(result) {
+                alert(result);
+            }, error: function(result){
+                alert("Error en el php" + result);
+            }
+        })
+    });
+
+    $("#AñadirAlCarrito").click(function(){
+        $.ajax({
+            type: "POST",
+            url: './controlador/carrito.php',
+            data: {ID_PRODUCTO: ID_PRODUCTO, cantidad:  $("#acomprar").val(), action: 'agregarproducto'}, 
+            success: function(result) {
+                alert(result);
+            }, error: function(result){
+                alert("Error en el php" + result);
+            }
+        })
+    });
+
+
+
+
+    $("#form_cotizacion").submit(function(event){
+        event.preventDefault();
+            $.ajax({
+            type: "POST",
+            url: './controlador/carrito.php',
+            data: {ID_PRODUCTO: ID_PRODUCTO, PrecioDado: $("#preciocotizado").val(), action: 'cotizar'}, 
+            success: function(result) {
+                alert(result);
+            }, error: function(result){
+                alert("Error en el php" + result);
+            }
+        })
+    });
+
+
+
+    $("#EditarJuguete").click(function(){
+        window.location.href = "editar_info_producto.php?ID_PRODUCTO="+ ID_PRODUCTO ;
+    });
+    
     $("#coment_form").submit(function(event){
         event.preventDefault();
         

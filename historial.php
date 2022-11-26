@@ -11,6 +11,7 @@ include('./templates/header.php');
         if ($_SESSION['ID_ROL']==1){
     ?>
             <h1 class="Titulos"> Consulta de compras  </h1>
+            <label for=""> Debes comentar cada producto comprado para que aparezca en el historial. </label>
 
             <p> De esta fecha: </p>
             <input type="date" id="desde">
@@ -19,7 +20,6 @@ include('./templates/header.php');
             <br> <br>
 
             <button type="button" id="buscar_Compras" class="btn btn-primary btn-info" > Buscar compra </button>
-
             <hr>
             <div>
                 <div class="container">

@@ -7,6 +7,8 @@ if (isset($_GET['action'])){
     searchUser();
     else if ($action == 'searchToys')
     searchToys();
+    else if ($action == 'getporCategoria')
+    getporCategoria();
 }
 
 function searchToys(){
@@ -20,4 +22,12 @@ function searchUser(){
 
     $buscar = new BusquedaControlador($busqueda);
     $buscar->MostrarBuscados();
+}
+
+
+function getporCategoria(){
+    $busqueda = $_GET['busqueda'];
+
+    $buscar = new BusquedaControlador($busqueda);
+    $buscar->cargarjuguetes();    
 }

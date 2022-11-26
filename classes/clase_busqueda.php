@@ -78,6 +78,38 @@ class Search extends Dbh {
         echo json_encode($lista_info);
     }
 
+
+
+
+    protected function getporc($busqueda){
+        $stmt = $this-> connect()-> prepare('CALL sp_gestionBusqueda (?, ?);');	
+        if (!$stmt->execute(array(4, '%'.$busqueda.'%'))){
+            $stmt = null;
+            echo "error en la busqueda de juguetes.";
+            //header ("location: ../index.php?error=stmtfailed");
+            exit();
+        }
+
+        $juguetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($juguetes as $row): 
+            $nombre = $row['nombre'];
+            $precio = $row['precio'];
+            $tipoVenta = $row['tipoVenta'];
+            $vendedor = $row['vendedor'];
+            $icono = $row['icono'];
+            $ID_PRODUCTO = $row['ID_PRODUCTO'];
+            $categorias = $row['categorias'];
+
+
+            $juguetess[] = array("nombre" => $nombre,"precio" => $precio, "tipoVenta" => $tipoVenta,
+            "vendedor" => $vendedor, "icono" => $icono,  "ID_PRODUCTO" => $ID_PRODUCTO, "categorias" => $categorias) ;
+        endforeach;
+
+
+        $stmt = null; 
+        echo json_encode($juguetess);
+    }
 }
 
 

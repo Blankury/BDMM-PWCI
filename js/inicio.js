@@ -1,5 +1,6 @@
 getCategorias();
 
+
 $.ajax({
     data: {action: 'getJuguetes'},
     type: "POST",
@@ -22,6 +23,35 @@ $.ajax({
         console.log("La solicitud regreso con un error: " + result);
     }  
 });
+
+
+try{
+
+    const valoresCAT = window.location.search;
+
+    const urlParamsCAT = new URLSearchParams(valoresCAT);
+    var busquedacat = urlParamsCAT.get("categoria");
+    $('#container_juguetes').empty();
+
+    
+$.ajax({
+    data: {action: 'getporCategoria', busqueda: busquedacat},
+    type: "GET",
+    url: './controlador/busqueda_ctrl.php',
+    async: false,
+    success: function(result){
+        var data = JSON.parse(result);
+        for(let i = 0; i < data.length; i++){
+            $("#container_juguetes").append('<div class="container-fluid separadorDoble" > <div class="row"> <div class="col-3 text-center" > <img src="' + data[i].icono +'" class="img-thumbnail" width="150px " height =150px alt=""> </div> <div class="col-9 bg-info separador" > <h4 id="Nombre producto"> ' +  data[i].nombre +'</h4> <label> MXN ' + data[i].precio +' </label> <br> <label> Categorías: ' +  data[i].categorias +' </label> <label > Venta de: </label> <label > ' +  data[i].vendedor + '</label> <div align = "right"> <button type="button" id="Ver' + data[i].ID_PRODUCTO +'" value="'+  data[i].ID_PRODUCTO + '" class="btn btn-primmary bg-warning VER" style="right: 10px;"> Ver </button></div> </div> </div> </div> <hr>');
+        }
+    },
+    error: function(result){
+        console.log("La solicitud regreso con un error: " + result);
+    }  
+});
+}catch (error){
+
+}
 
 
 $(document).ready(function(){
@@ -80,7 +110,14 @@ $(document).ready(function(){
     $(".VER").click(function(){
         window.location.href = "producto.php?ID_PRODUCTO=" + $(this).val() ;
     });
-    
+    $("#cotizaPendiente").click(function(){
+        window.location.href = "cotizaciones.php";
+    });
+    $("#pendientesdeAutori").click(function(){
+        window.location.href = "misproductos.php" ;
+    });
+
+
     $("#form_listas").submit(function(event){
         event.preventDefault();
         $.ajax({
@@ -150,7 +187,7 @@ function getCategorias(){
         success: function(result){
             var data = JSON.parse(result);
             for(let i = 0; i < data.length; i++){
-                $("#categs").append('<li> <a href="" >' + data[i].nombre + '</a>  </li>');       
+                $("#categs").append('<li> <a href="porcategoria.php?categoria='+ data[i].nombre +'" >' + data[i].nombre + '</a>  </li>');       
                 $("#categorias_selec").append('<label><input type="checkbox" name="categoria_Selec[]" value='+  data[i].ID_CATEGORIA +'><span> '+ data[i].nombre +'</span></label>');        
             }
         },

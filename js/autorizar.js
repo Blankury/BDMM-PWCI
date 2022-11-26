@@ -16,7 +16,6 @@
     }  
 });
 
-
 $(document).ready(function(){  
     $("#Autorizar").click(function(){
         alert(ID_PRODUCTO);

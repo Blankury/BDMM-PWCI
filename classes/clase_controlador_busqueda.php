@@ -21,6 +21,11 @@ class BusquedaControlador extends Search {
         }
         return $check;
     }
+
+    
+    public function cargarjuguetes(){
+        $this->getporc($this->busqueda);
+    }
 }
 
 ?>

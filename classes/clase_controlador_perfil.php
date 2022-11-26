@@ -31,20 +31,19 @@ class PerfilControlador extends PerfilActions {
     public function ActualizarInfo(){
         if ($this->inputVacio() == false ){
             echo "Llena todos los datos";
-            //header ("location: ../index.php?error=inputVacio");
             exit();
             
-        }
+        }    
+
         if ($this->correoUnico() == false ){
             echo "El correo ya existe.";
-            //header ("location: ../index.php?error=correoUnico");
             exit();
         }
         if ($this->usuarioUnico() == false ){
             echo "Nombre de usuario en uso.";
-            //header ("location: ../index.php?error=correoUnico");
             exit();
         }
+        
         $this->ActualizarYa($this->nombre, $this->apellido, $this->nacimiento, $this->usuario,  $this->correo, $this->sexo, $this->privacidad, $this->foto, $this->ID_ROL, $this->ID_USUARIO);
         echo 1;
          
@@ -60,7 +59,7 @@ class PerfilControlador extends PerfilActions {
 
     private function inputVacio(){
         $check;
-        if (empty($this->nombre) || empty ($this->apellido) || empty ($this->nacimiento) ||empty ($this->usuario)  || empty ($this->correo) || empty ($this->sexo) || empty ($this->privacidad) || empty ($this->foto) || empty ($this->ID_ROL)){
+        if (empty($this->nombre) || empty ($this->apellido) || empty ($this->nacimiento) ||empty ($this->usuario)  || empty ($this->correo) || empty ($this->sexo) || empty ($this->ID_ROL)){
             $check = false;
         }else {
             $check = true;

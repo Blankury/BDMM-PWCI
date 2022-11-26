@@ -13,13 +13,15 @@ END =)
 delimiter ;
 
 delimiter (?
-CREATE FUNCTION f_precioAPagar ( fID_CARRITO float)
+CREATE FUNCTION f_precioAPagar ( fID_CLIENTE int)
 	RETURNS float
 READS SQL DATA
 BEGIN
-    DECLARE total flat;
-	set total_UNIDADES = (SELECT cantidad	FROM juguetes WHERE ID_PRODUCTO = pID_PRODUCTO);
-	return total_UNIDADES;
+    DECLARE totalcotizado float; DECLARE totalNormal float; Declare totalFinal float;
+    set totalcotizado = (SELECT sum(a.preciocotizado) precioCotizado FROM poductoscarrito a INNER JOIN juguetes b on b.ID_PRODUCTO = a.ID_JUGUETE where ID_CLIENTE = fID_CLIENTE);
+	set totalNormal = (SELECT sum(b.precio * a.cantidadCompra) preciojuguete FROM poductoscarrito a INNER JOIN juguetes b on b.ID_PRODUCTO = a.ID_JUGUETE where ID_CLIENTE = fID_CLIENTE );
+    set totalFinal = totalcotizado + totalNormal;
+	return totalFinal;
 END (?
 delimiter ;
 
@@ -33,8 +35,3 @@ BEGIN
 	return promedio;
 END (?
 delimiter ;
-
-
-
-SELECT count(b.precio) precio FROM poductoscarrito INNER JOIN juguetes b ;                
-SELECT ID_CARRITO, ID_JUGUETE, cantidadCompra, nombre, precio FROM viewCarrito WHERE ID_CLIENTE =5;

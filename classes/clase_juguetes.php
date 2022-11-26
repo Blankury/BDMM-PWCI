@@ -232,6 +232,59 @@ class Toys extends Dbh {
     }
 
 
+
+
+
+    protected function accioneliminarjuguete($ID_PRODUCTO){
+        $stmt = $this->connect()->prepare('call sp_infoJUGUETE(?, ?);');
+
+        if (!$stmt->execute(array(5, $ID_PRODUCTO))){
+            $stmt = null;
+            echo 'error';
+            exit();
+        }
+        
+        $stmt = null; 
+        
+    }
+
+
+    protected function cargarautorizado($ID_VENDEDOR){
+        $stmt = $this->connect()->prepare('call sp_MISJUGUETES(?);');
+        if (!$stmt->execute(array($ID_VENDEDOR))){
+            $stmt = null;
+            echo "error.";
+            //header ("location: ../index.php?error=stmtfailed");
+            exit();
+        }
+
+        $juguetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($juguetes as $row): 
+            $nombre = $row['nombre'];
+            $descripcion = $row['descripcion'];
+            $precio = $row['precio'];
+            $tipoVenta = $row['tipoVenta'];
+            $autorizado = $row['autorizado'];
+            $cantidad = $row['cantidad'];
+            $valoracion = $row['valoracion'];
+            $vendedor = $row['vendedor'];
+            $ID_PRODUCTO = $row['ID_PRODUCTO'];
+            $icono = $row['icono'];
+            $video = $row['video'];
+            $imagenes = $row['imagenes'];
+            $categorias = $row['categorias'];
+            $lista_info[] = array("autorizado" => $autorizado, "nombre" => $nombre, "descripcion" => $descripcion, "precio" => $precio, "tipoVenta" => $tipoVenta, "cantidad" => $cantidad,
+            "valoracion" => $valoracion, "vendedor" => $vendedor, "icono" => $icono,  "ID_PRODUCTO" => $ID_PRODUCTO, "categorias" => $categorias, "video" => $video, "imagenes" => $imagenes, );
+        endforeach;
+
+        $stmt = null; 
+      
+
+        echo json_encode($lista_info);        
+    }
+
+
     protected function Autorizar($ID_PRODUCTO){
         $stmt = $this->connect()->prepare('call sp_autorizar(?);');
         if (!$stmt->execute(array($ID_PRODUCTO))){

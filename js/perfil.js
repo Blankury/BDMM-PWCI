@@ -137,11 +137,12 @@ $(document).ready(function(){
                 contentType: false, 
                 processData: false, 
                 success: function(result) {
-                    alert(result);
+                    
                     console.log(result);
                     if (result == 1){
-                        window.location.href = "perfil_usuario.php";
+                        alert('se actualizó el perfil.');
 
+                        window.location.href = "perfil_usuario.php?user=" + $("#edusuario").val();
                     }
                 }, error: function(result){
                     alert("Error en el php" + result);

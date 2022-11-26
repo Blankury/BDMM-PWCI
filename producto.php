@@ -48,11 +48,18 @@ include('./templates/header.php');
             <?php
                 if ($_SESSION['ID_ROL']==1){
             ?>
-                <button type="button" id="aCarrito" class="btn btn-primary btn-info" data-bs-toggle="modal" data-bs-target="#cotModal"> Agregar al carrito </button>
+            <div id="botones">            
                 <button type="button" id="aListamodal" class="btn btn-primary btn-info" data-bs-toggle="modal" data-bs-target="#listModal"> Agregar a lista </button>
                 <button type="button" id="facebook" class="btn btn-primary " onclick="compartir_producto()"> Compartir en facebook </button>
+            </div>
             <?php
-                } 
+                } else if ($_SESSION['ID_ROL']==2){
+            ?>
+                <button type="button" id="EditarJuguete" class="btn btn-primary btn-info"> Editar </button>
+                <button type="button" id="EliminarJuguete" class="btn btn-primary btn-info"> Eliminar </button>
+
+            <?php
+                }
             ?>
     </div>
     <hr>
@@ -138,26 +145,43 @@ include('./templates/header.php');
     <div class="modal fade" id="cotModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form action="inicio.php" method="POST" id="form_cotizacion">
-            <div class="modal-content">
+            <div class="modal-content text-center">
                     <div class="modal-header">
                         <h5 class="modal-title Titulos" id="exampleModalLabel"> El juguete es para cotizar </h5>
                     </div>
                 <div class="modal-body">
                     <div>
-                        <label for="yes_no_radio"> ¿Qué le parece este precio?</label> <label> $343 </label>
+                        <label for="yes_no_radio"> Ingresa un precio razonable: </label>
                         <br> <br>
-                        <button type="button" class="btn bg-secondary full_input">  Si </button>
-                        <button type="button" class="btn bg-secondary full_input"> No </button>
+                        <input type="number" id="preciocotizado" min="1" required>
                     </div>
                 </div>
                     <div class="modal-footer">
                         <button type="button" class="btn bg-warning" data-bs-dismiss="modal"> Cerrar </button>
-                        <input type="submit" id="cotizacionCompleta" class="btn btn-primary btn-info" value="Añadir al carrito " name="" disabled>
+                        <input type="submit" id="cotizacionCompleta" class="btn btn-primary btn-info" value="Enviar. " name="">
                     </div>
                 </div>
             </form>
         </div>
-    </div>
+    </div> 
+    <div class="modal fade" id="añadirCarrModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title Titulos" id="exampleModalLabel"> Unidades a comprar </h5>
+                    </div>
+                <div class="modal-body">
+                    <input type="number" id="acomprar" name="acomprar" min="1"  value="1">
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-warning" data-bs-dismiss="modal"> Cerrar </button>
+                        <button type="button" id="AñadirAlCarrito" class="btn btn-primary btn-info"  name="" > Añadir al carrito </button>
+                    </div>
+                </div>
+        </div>
+    </div> 
+        
+
 
     <div class="modal fade" id="listModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

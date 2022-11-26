@@ -43,9 +43,10 @@ ID_VENDEDOR INT NOT NULL COMMENT 'Identificador del usuario que vende el juguete
 FOREIGN KEY (ID_VENDEDOR) REFERENCES usuarios (ID_USUARIO),
 ID_ADMIN INT COMMENT 'Identificador del administrador que autorizó la venta del juguete.',
 FOREIGN KEY (ID_ADMIN) REFERENCES usuarios (ID_USUARIO),
-autorizado BIT DEFAULT 0 COMMENT 'Identificador para saber si el producto puede venderse o todavía no; 0 = no autorizado, 1 = si autorizado.',
-icono MEDIUMBLOB NOT NULL COMMENT 'Icono del juguete.'
-#totalvendidos INT
+autorizado INT DEFAULT 0 COMMENT 'Identificador para saber si el producto puede venderse o todavía no; 0 = no autorizado, 1 = si autorizado.',
+icono MEDIUMBLOB NOT NULL COMMENT 'Icono del juguete.',
+estatus bit default 1 
+
 );
 
 CREATE TABLE if not exists videos (
@@ -74,7 +75,6 @@ FOREIGN KEY (ID_CLIENTE) REFERENCES usuarios (ID_USUARIO),
 ID_JUGUETE INT NOT NULL  COMMENT 'Identificador del juguete al cual se le comenta.',
 FOREIGN KEY (ID_JUGUETE) REFERENCES juguetes (ID_PRODUCTO)
 );
-ALTER TABLE comentarios MODIFY COLUMN calificación VARCHAR(500) COMMENT 'Descripción de la lista.' ;
 
 CREATE TABLE if not exists categorias (
 ID_CATEGORIA INT PRIMARY KEY AUTO_INCREMENT NOT NULL COMMENT 'Identificador único de la categorías.',
@@ -103,24 +103,18 @@ FOREIGN KEY (ID_CLIENTE) REFERENCES usuarios (ID_USUARIO)
 );
 
 CREATE TABLE if not exists imagenesListas (
-ID_LISTA INT NOT NULL,
+ID_LISTA INT NOT NULL COMMENT 'Identificador de la lista.',
 FOREIGN KEY (ID_LISTA) REFERENCES listas (ID_LISTA),
-ruta MEDIUMBLOB NOT NULL
+ruta MEDIUMBLOB NOT NULL cOMMENT 'Imagenes de la lista.'
 );
 
-ALTER TABLE imagenesListas MODIFY COLUMN ID_LISTA INT NOT NULL COMMENT 'Identificador de la lista.' ;
-ALTER TABLE imagenesListas MODIFY COLUMN ruta MEDIUMBLOB NOT NULL COMMENT 'Imagenes de la lista.' ;
-
 CREATE TABLE if not exists deseos (
-ID_LISTA INT NOT NULL,
-FOREIGN KEY (ID_LISTA) REFERENCES listas (ID_LISTA),
-ID_JUGUETE INT NOT NULL,
+ID_LISTA INT NOT NULL COMMENT 'Identificador de la lista.',
+FOREIGN KEY (ID_LISTA) REFERENCES listas (ID_LISTA) ,
+ID_JUGUETE INT NOT NULL COMMENT 'Identificador del juguete que se añadio a la lista de deseos.',
 FOREIGN KEY (ID_JUGUETE) REFERENCES juguetes (ID_PRODUCTO)
 );
 
-ALTER TABLE deseos MODIFY COLUMN ID_LISTA INT NOT NULL COMMENT 'Identificador de la lista.' ;
-ALTER TABLE deseos MODIFY COLUMN ID_JUGUETE INT NOT NULL COMMENT 'Identificador del juguete que se añadio a la lista de deseos.' ;
- 
 CREATE TABLE if not exists carrito (
 ID_CARRITO INT PRIMARY KEY AUTO_INCREMENT NOT NULL  COMMENT 'Identificador único del carrito.',
 ID_CLIENTE INT NOT NULL COMMENT 'Identificador del cliente al cual pertenece el carrito.' ,
@@ -138,22 +132,22 @@ FOREIGN KEY (ID_CLIENTE) REFERENCES usuarios (ID_USUARIO),
 ID_JUGUETE INT NOT NULL  COMMENT 'Identificador del juguete añadido al carrito.',
 FOREIGN KEY (ID_JUGUETE) REFERENCES juguetes (ID_PRODUCTO),
 cantidadCompra INT NOT NULL  COMMENT 'Cantidad de unidades del juguete añadidas al carrito.' ,
-preciocotizado float
+preciocotizado float,
+estatus Bit default 0 comment '0 no ha sido comprado, 1 ya se compró'
 );
-
 
 CREATE TABLE if not exists cotizaciones (
+ID_cotizacion INT PRIMARY KEY AUTO_INCREMENT NOT NULL COMMENT 'Identificador.',
 ID_JUGUETE INT NOT NULL COMMENT 'Identificador de la cotizacion.',
 FOREIGN KEY (ID_JUGUETE) REFERENCES juguetes (ID_PRODUCTO),
-ID_USUARIO INT NOT NULL COMMENT 'Identificador del usuario',
+ID_USUARIO INT NOT NULL COMMENT 'Identificador del usuario CLIENTE',
 FOREIGN KEY (ID_USUARIO) REFERENCES usuarios (ID_USUARIO),
-precio1 FLOAT NOT NULL  COMMENT 'Precio inicial del juguete.' ,
-precio2 FLOAT NOT NULL,
-precio3 FLOAT NOT NULL
+ID_VENDEDOR INT NOT NULL COMMENT 'Identificador del usuario VENDEDOR',
+FOREIGN KEY (ID_VENDEDOR) REFERENCES usuarios (ID_USUARIO),
+precio FLOAT NOT NULL COMMENT 'Precio pedido.' ,
+request bit default 0 comment '0 = no atendido, 1 = atendido',
+response INT comment 'acepta el precio o no; 0 = nulo, 1 = aceptado, 2 = rechazados'
 );
-
-ALTER TABLE cotizaciones MODIFY COLUMN precio2 FLOAT NOT NULL COMMENT 'Segundo precio del juguete.' ;
-ALTER TABLE cotizaciones MODIFY COLUMN precio3 FLOAT NOT NULL COMMENT 'Tercer precio del juguete.' ;
 
 CREATE TABLE if not exists pedidosYventas (
 ID_VENTA INT PRIMARY KEY AUTO_INCREMENT NOT NULL  COMMENT 'Identificador único de la compra/venta.',

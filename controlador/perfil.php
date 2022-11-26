@@ -15,9 +15,10 @@ if (isset($_POST['action'])) {
 }
 
 else {
+    $_realImage = 'null';
+
     if (!empty( $_FILES["foto"]["name"])){
-
-
+        
         $fileName = basename($_FILES["foto"]["name"]);
         $imageType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $allowedTypes = array("png", "jpg", "gif");
@@ -32,10 +33,9 @@ else {
             echo "formato no valido.";
             exit();  
         }
-    }else{
-        echo "no subiste foto";
-        exit();
     }
+    $privacidad = "Publico" ;
+
     $nombre = $_POST['ednombre'];
     $apellido = $_POST['edapellido'];
     $nacimiento = $_POST['ednacimiento'];
@@ -43,16 +43,19 @@ else {
     $correo = $_POST['edcorreoUsuario'];
     $foto = $_realImage;
     $sexo = $_POST['Sexo'];
-    $privacidad = $_POST['Privacidad'];
+    if (isset($_POST["Privacidad"])){
+        $privacidad = $_POST['Privacidad'];
+    }
 
     session_start();
 
     $ID_USUARIO = $_SESSION['ID_USUARIO'];
     $ID_ROL = $_SESSION['ID_ROL'];
+    
     $perfil = new PerfilControlador($nombre, $apellido, $nacimiento, $usuario, $correo, $sexo, $privacidad, $foto, $ID_ROL, $ID_USUARIO); 
+
     $perfil->ActualizarInfo();
 
-    //header ("location: ../inicio.php?error=none");
 }
 
 

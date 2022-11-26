@@ -6,19 +6,15 @@ class PerfilActions extends Dbh {
 
 
     protected function ActualizarYa($nombre, $apellido, $nacimiento,  $usuario, $correo, $sexo, $privacidad, $foto, $ID_ROL, $ID_USUARIO){
-        //$stmt = $this->connect()->prepare('		SELECT nombre, apellido, usuario, nacimiento, correo, sexo, fechaCreacion, foto, privacidad FROM usuarios WHERE ID_USUARIO = (?);');
         $stmt = $this-> connect()-> prepare('CALL sp_gestionUsuarios (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);');	
-        
         if (!$stmt->execute(array(5, $ID_USUARIO, $nombre, $apellido, $nacimiento, $usuario, $correo, null, $sexo, $privacidad, $foto, null))){
             $stmt = null;
-            //header ("location: ../index.php?error=stmtfailed");
-            exit();
+            echo 'error'; exit();
         }
         $stmt = null;
-        /*quitar cookies y ponerlas de new
-        session_start();
-            $_SESSION['correo_usuario'] = $correo;
-            $_SESSION['username_usuario'] = $usuario[0]['usuario']*/
+        $_SESSION['correo_usuario'] = $correo;
+        $_SESSION['username_usuario'] = $usuario;
+
     }
 
     protected function CargarInfo($usuario){
@@ -68,7 +64,7 @@ class PerfilActions extends Dbh {
     }
 
     protected function RevisarCorreo($correo, $ID_USUARIO){
-        $stmt = $this-> connect()-> prepare('CALL sp_gestionUsuarios (?, ?, ?, ?);');
+        $stmt = $this-> connect()-> prepare('CALL sp_GetCorreoContra (?, ?, ?, ?);');
         if (!$stmt->execute(array(1, null, $correo, $ID_USUARIO))){ //false si no se pudo ejecutar
             $stmt = null;
             header ("location: ../index.php?error=stmtfailedCorreo");
@@ -86,7 +82,7 @@ class PerfilActions extends Dbh {
     }
 
     protected function RevisarUsuario($usuario, $ID_USUARIO){
-        $stmt = $this-> connect()-> prepare('CALL sp_gestionUsuarios (?, ?, ?, ?);');
+        $stmt = $this-> connect()-> prepare('CALL sp_GetCorreoContra (?, ?, ?, ?);');
         if (!$stmt->execute(array(2, $usuario, null, $ID_USUARIO))){ //false si no se pudo ejecutar
             $stmt = null;
             //header ("location: ../index.php?error=stmtfailedCorreo");

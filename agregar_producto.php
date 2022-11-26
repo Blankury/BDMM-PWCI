@@ -15,7 +15,7 @@ include('./templates/header.php');
             <input type="text" name = "nombre" class="full_input" style="width: 400px;" id="Nombre_producto" placeholder ="Nombre del juguete" required>
             <label style="width: 100%; margin-bottom: 20px; color: rgb(81, 95, 95);"> Descripcion: </label>
             <input type="textarea" name = "Descripcion" class="full_input" style="width: 400px;" id="Descripcion" placeholder ="Descripcion" required>
-            <label style="width: 100%; margin-bottom: 20px; color: rgb(81, 95, 95);"> Precio: </label>
+            <label style="width: 100%; margin-bottom: 20px; color: rgb(81, 95, 95);"> Precio (MXN): </label>
             <input type="number" name = "precio" class="full_input" style="width: 400px;" id="precio"  placeholder ="Precio" required>
             <label style="width: 100%; margin-bottom: 20px; color: rgb(81, 95, 95);"> Cantidad disponible: </label>
             <input type="number" name = "cantidad" class="full_input" style="width: 400px;" id="cantidad"  placeholder ="Cantidad disponible" required>
